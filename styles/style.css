@@ -1,0 +1,107 @@
+.viewInfo{
+  position: fixed;
+  right: 50px;
+}
+
+.mdl-data-table{
+  left: 130px;
+}
+
+.tableTitles{
+  text-align: center;
+}
+
+.shiftBookingButton{
+  left: 500px;
+  bottom: 30px;
+  background-color: #3f51b5;
+  color: white;
+}
+
+.forecastMarker{
+  width: auto;
+  height: auto;
+  background: white;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.tempField{
+  display: inline-block;
+  font-size: 16px;
+  height: 27px;
+  line-height: 25px;
+  vertical-align: middle;
+}
+
+.markerName{
+  display: inline-block;
+  font-size: 16px;
+  overflow: hidden;
+  line-height: 25px;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.shiftWaypointBtn{
+  left: 100px;
+}
+
+.verticalLine{
+  border: 1px solid black;
+  height: 790px;
+  width: 0px;
+  top: 0px;
+}
+
+#dialogMap{
+  height: 400px;
+  width: 400px;
+  top: 30px;
+  border: 1px solid grey;
+}
+
+#mapInBooking{
+  height: 500px;
+  width: 500px;
+  left: 140px;
+  border: 1px solid grey;
+}
+
+#mapOfPort{
+  height: 350px;
+  width: 400px;
+  top: 500px;
+  left: 925px;
+  position: fixed;
+  border: 1px solid grey;
+}
+
+#mapOfRoute{
+  top: 50px;
+  height: 700px;
+  width: 700px;
+  border: 1px solid grey;
+}
+
+#addPortDone, #addPortCancel{
+  top: 400px;
+}
+
+#waypoint_map, #pathDrawn_map{
+  height: 500px;
+  width: 500px;
+  left: 200px;
+  top: 110px;
+  border: 1px solid grey;
+}
+
+#newShip, #newPort, #newBooking{
+  position: fixed;
+  right: 155px;
+}
+
+#viewShipInfo, #viewPortInfo, #viewRouteInfo{
+  position: fixed;
+  right: 150px;
+}

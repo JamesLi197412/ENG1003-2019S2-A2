@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+		<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+		<link rel="stylesheet" href="styles/style.css">
+		<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.1.1/mapbox-gl.css' rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<span class="mdl-layout-title"><b>Ship Us Safe</b></span>
+				<div class="mdl-layout-spacer"></div>
+				<nav class="mdl-navigation" id="buttonSection">
+				</nav>
+			</div>
+		</header>
+		<div class="mdl-layout__drawer" id="menu">
+			<span class="mdl-layout-title">Menu</span>
+			<nav class="mdl-navigation">
+				<a class="mdl-button mdl-js-button mdl-js-ripple-effect" onclick="switchUI('listOfShips')">Ships</a>
+				<a class="mdl-button mdl-js-button mdl-js-ripple-effect" onclick="switchUI('listOfPorts')">Ports</a>
+				<a class="mdl-button mdl-js-button mdl-js-ripple-effect" onclick="switchUI('listOfBookings')">Bookings</a>
+			</nav>
+		</div>
+		<main class="mdl-layout__content">
+			<section class="mdl-layout__tab-panel is-active" id="listOfBookings">
+				<div class="page-content">
+					<div class="mdl-grid">
+						<!-- Column for viewing list of routes on table -->
+							<div class="mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+								<h2 class="tableTitles">Bookings</h2><br>
+								<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+									<thead>
+										<tr>
+											<th>Departure</th>
+											<th>From</th>
+											<th>To</th>
+											<th>Ship</th>
+											<th>View</th>
+											<th>Delete</th>
+										</tr>
+									</thead>
+									<tbody id="bookingsTable"></tbody>
+								</table>
+							</div>
+							<div class="mdl-cell mdl-cell--col-4 mdl-cell--4-col-tablet">
+								<div class="mdl-selectfield mdl-js-selectfield" style="right: 350px; position: fixed;">
+									<select class="mdl-selectfield__select" id="routeFilter" oninput="displayRoutes()" style="width: 134px; height: 39px;">
+										<option value="All">All</option>
+										<option value="A week ago">A week ago</option>
+										<option value="Fortnight ago">Fortnight ago</option>
+										<option value="A month ago">A month ago</option>
+									</select>
+								</div>
+								<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="newBooking" onclick="switchUI('bookingEntries')">New booking</button>
+								<div id='deleteDialog'></div>
+							</div>
+						</div>
+					</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="viewingRouteOnMap">
+				<div class="page-content">
+					<div class="mdl-grid" style="padding: 0px;">
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet">
+						<!-- View route information -->
+							<h2 style="text-align: center;">Route Information</h2>
+							<span style="font-size: 18px;">Departure: <label id="departure"></label></span><br>
+							<span style="font-size: 18px;">From: <label id="from"></label></span><br>
+							<span style="font-size: 18px;">To: <label id="to"></label></span><br>
+							<span style="font-size: 18px;">Ship: <label id="ship"></label></span><br>
+							<span style="font-size: 18px;">Cost: <label id="cost"></label></span><br>
+							<span style="font-size: 18px;">Distance (km): <label id="distance"></label></span><br>
+							<span style="font-size: 18px;">Arrival: <label id="arrival"></label></span><br>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="postpone">Postpone</button>
+							<br><br>
+							<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="viewWeatherOnRoute" style="left: 40px;"></table>
+							<div id="postponeDialog"></div>
+						</div>
+						<div class="mdl-cell mdl-cell--col-4 mdl-cell--2-col-tablet" style="width: 150px; margin: 0px;">
+							<div class="verticalLine"></div>
+						</div>
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet">
+							<div id="mapOfRoute"></div>
+						</div>
+					 </div>
+				</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="bookingEntries">
+				<div class="page-content">
+					<div class="mdl-grid">
+							<div class="mdl-cell mdl-cell--col-4 mdl-cell--2-col-tablet">
+								<h3 style="text-align: center;">Map</h3><br>
+								<div id="mapInBooking"></div>
+							</div>
+							<div class="mdl-cell mdl-cell--col-4 mdl-cell--2-col-tablet" style="width: 300px;"></div>
+								<div class="mdl-cell mdl-cell--col-4 mdl-cell--4-col-tablet">
+										<label>Ship: </label><input class='mdl-textfield__input' type='text' id='bookedShip' oninput="findBookedShip(value)" list='ships'>
+										<button class="mdl-button mdl-js-button mdl-button--fab shiftBookingButton mdl-js-ripple-effect" onclick="showNewShipDialog('booking_newShip', document.getElementById('bookedShip').value)">
+										<i class="material-icons">add</i></button><br>
+										<datalist id='ships'></datalist>
+										<label>Start: </label><input class='mdl-textfield__input' type='text' id='sourcePort' oninput="findBookedPort(value, true)" list='ports'>
+										<button class="mdl-button mdl-js-button mdl-button--fab shiftBookingButton mdl-js-ripple-effect" onclick="showNewPortDialog('booking_newPort', document.getElementById('sourcePort').value, true)">
+										<i class="material-icons">add</i></button><br>
+										<label>Destination: </label><input class='mdl-textfield__input' type='text' id='destinationPort' oninput="findBookedPort(value, false)" list='ports'>
+										<button class="mdl-button mdl-js-button mdl-button--fab shiftBookingButton mdl-js-ripple-effect" onclick="showNewPortDialog('booking_newPort', document.getElementById('destinationPort').value, false)">
+										<i class="material-icons">add</i></button><br>
+										<datalist id='ports'></datalist>
+										<label>Departure date: </label><input class='mdl-textfield__input' type='date' id='departDate'><br>
+										<label>Departure time: </label><input class='mdl-textfield__input' type='time' id='departTime'><br>
+										<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="cancelRoute()">Cancel</button>
+										<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="setBookingEntries()">Next</button>
+
+								<!--Dialogs for creating new ship and new port respectively-->
+										<div id="booking_newShip"></div>
+										<div id="booking_newPort"></div>
+								</div>
+						</div>
+					</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="placeWaypoints">
+				<div class="page-content">
+					<div class="mdl-grid">
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--2-col-tablet">
+							<div id="waypoint_map"></div>
+						</div>
+						<div class="mdl-cell mdl-cell--col-4 mdl-cell--2-col-tablet" style="width: 300px;"></div>
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet">
+							<br><br><br><br><br>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored shiftWaypointBtn" onclick="addWayPoint()">Add waypoint</button>
+							<br><br><br>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored shiftWaypointBtn" onclick="deleteWaypoint()">Delete waypoint</button>
+							<br><br><br><br><br>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored shiftWaypointBtn" onclick="switchUI('bookingEntries')">Back</button>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored shiftWaypointBtn" onclick="routeEstimates()">Next</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="estimations">
+				<div class="page-content">
+					<div class="mdl-grid">
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet" style="width: 500px;">
+							<div id="pathDrawn_map"></div>
+						</div>
+						<div class="mdl-cell mdl-cell--col-4 mdl-cell--4-col-tablet" style="width: 300px;"></div>
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet" style="width: 450px; font-size: 18px;">
+							<h2 style="text-align: center;">Travel estimations</h2><br>
+							<label>Estimated arrival time: </label><label id="estimateArrival"></label><br><br>
+							<label>Estimated total distance (km): </label><label id="estimateTotalDistance"></label><br><br>
+							<label>Ship's range (km): </label><label id="maxShipDistance"></label><br><br>
+							<label>Estimated cost: </label><label id="estimateCost"></label><br><br><br>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="switchUI('placeWaypoints')">Back</button>
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="finaliseBooking" onclick="finalRouteDetails()">Next</button>
+							<br><br><br><br>
+							<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="left: 40px;" id="weatherTablePrediction">
+							</table>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="bookingConfirm">
+					<div class="page-content">
+						<div class="mdl-grid">
+							<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet"></div>
+							<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet" style="font-size: 18px;">
+								<h2 style="text-align: center;">Booking confirmation</h2>
+								<br><br>
+								<label>Ship: </label><label id="shipConfirm"></label><br><br>
+								<label>Starting Port: </label><label id="sourcePortConfirm"></label><br><br>
+								<label>Destination Port: </label><label id="destinationPortConfirm"></label><br><br>
+								<label>Departure date and time: </label><label id="departureConfirm"></label><br><br>
+								<label>Arrival date and time: </label><label id="arrivalConfirm"></label><br><br>
+								<label>Travelling distance (km): </label><label id="distanceConfirm"></label><br><br>
+								<label>Booking cost: </label><label id="costConfirm"></label><br><br><br>
+								<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="switchUI('estimations')">Back</button>
+								<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" onclick="showYesNoDialog('confirm booking', 'confirmDialog')">Confirm</button>
+								<div id="confirmDialog"></div>
+							</div>
+							<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet"></div>
+						</div>
+					</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="listOfPorts">
+				<div class="page-content">
+					<div class="mdl-grid">
+						<!-- Column for table of ports -->
+						<div class="mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+							<h2 class="tableTitles">List of Ports</h2><br>
+							<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="left: 80px;">
+								<thead>
+									<tr>
+										<th>Port</th>
+										<th>Country</th>
+										<th>Type</th>
+										<th>View</th>
+									</tr>
+								</thead>
+								<tbody id="portTable"></tbody>
+							</table>
+						</div>
+						<!-- Column for viewing port information -->
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet">
+							<input class="mdl-textfield__input" type="text" id="portFilter" placeholder="Search port" style="position: fixed; left: 880px; width: 200px;" oninput="displayPorts()">
+							<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored' id="newPort" onclick="showNewPortDialog('listOfPorts_newPort', '', true)">New port</button>
+							<!-- View Port information -->
+							<br><br><br><div class="mdl-card mdl-shadow--2dp viewInfo" id="viewPortInfo" style="align: center;">
+								<div class="mdl-card__title">
+									<h2 class="mdl-card__title-text" style="text-align: center;">Port Information</h2>
+								</div>
+								<span>Name: <label id="portname"></label></span><br/>
+								<span>Country: <label id="country"></label></span><br/>
+								<span>Type: <label id="type"></label></span><br/>
+								<span>Size: <label id="size"></label></span><br/>
+								<span>Latitude: <label id="latitude"></label></span><br/>
+								<span>Longitude: <label id="longitude"></label></span><br/>
+							</div>
+							<div id="mapOfPort"></div>
+							<!-- Dialog for creating new port -->
+							<div id="listOfPorts_newPort"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="mdl-layout__tab-panel" id="listOfShips">
+				<div class="page-content">
+					<div class="mdl-grid">
+						<!-- Column for viewing ship table -->
+						<div class="mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+							<h2 class="tableTitles">List of Ships</h2><br>
+							<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Range (km)</th>
+										<th>Max speed (km/h)</th>
+										<th>View</th>
+									</tr>
+								</thead>
+								<tbody id="shipTable"></tbody>
+							</table>
+						</div>
+						<!-- Column for viewing ship information -->
+						<div class="mdl-cell mdl-cell--col-6 mdl-cell--4-col-tablet">
+							<div class="mdl-textfield mdl-js-textfield">
+								<input class="mdl-textfield__input" type="text" id="shipFilter" placeholder="Search ship" style="position: fixed; left: 850px; width: 200px;" oninput="displayShips()">
+							</div>
+							<button class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored' onclick="showNewShipDialog('listOfShips_newShip', '')" id="newShip">New ship</button>
+							<!-- View ship information -->
+							<br><br><br><div class="mdl-card mdl-shadow--2dp viewInfo" id="viewShipInfo" style="align: center;">
+								<div class="mdl-card__title">
+									<h2 class="mdl-card__title-text">Ship Information</h2>
+								</div>
+									<span>Name: <label id="shipname"></label></span><br/>
+									<span>Max Speed (km/h): <label id="maxspeed"></label></span><br/>
+									<span>Range (km): <label id="range"></label></span><br/>
+									<span>Description: <label id="shipdesc"></label></span><br/>
+									<span>Cost (per km): <label id="shipcost"></label></span><br/>
+									<span>Comments: <label id="shipcomments"></label></span><br/>
+								</div>
+								</div>
+							</div>
+							<!-- Dialog for creating new ship -->
+							<div id="listOfShips_newShip"></div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+		<script src="scripts/Port.js"></script>
+		<script src="scripts/Ship.js"></script>
+  	<script src="scripts/Bookings.js"></script>
+		<script src="scripts/route.js"></script>
+		<script src="scripts/services.js"></script>
+		<script src="scripts/shiplistClass.js"></script>
+		<script src="scripts/portlistClass.js"></script>
+		<script src="scripts/waypoint.js"></script>
+		<script src="scripts/ShipUsSafeMain.js"></script>
+	</body>
+</html>
